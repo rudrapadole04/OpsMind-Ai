@@ -1,0 +1,47 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: opsmind-ai-backend
+
+  # Database DataSource Configuration (H2 in-memory with easy switch to PostgreSQL)
+  datasource:
+    url: jdbc:h2:mem:opsmind_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  # Web H2 Console for viewing live tables during development
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+  # Hibernate 6 (JPA) Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 50
+    open-in-view: false
+
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 30MB
+
+# OpsMind AI Core Engine Settings
+opsmind:
+  rag:
+    chunk-size: 500
+    chunk-overlap: 100
+    similarity-threshold: 0.60
+    max-retrieved-chunks: 5
+    fallback-message: "I don't know based on the provided corporate SOPs."
