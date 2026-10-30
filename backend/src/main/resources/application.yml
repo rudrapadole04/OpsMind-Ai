@@ -39,6 +39,8 @@ spring:
 
 # OpsMind AI Core Engine Settings
 opsmind:
+  seed:
+    enabled: true
   rag:
     chunk-size: 500
     chunk-overlap: 100
