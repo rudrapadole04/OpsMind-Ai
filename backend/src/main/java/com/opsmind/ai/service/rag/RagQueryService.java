@@ -6,6 +6,7 @@ import com.opsmind.ai.model.dto.QueryResponse;
 import com.opsmind.ai.model.entity.CitationEntity;
 import com.opsmind.ai.model.entity.QueryLogEntity;
 import com.opsmind.ai.repository.QueryLogRepository;
+import com.opsmind.ai.service.graph.KnowledgeGraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,14 +23,17 @@ public class RagQueryService {
     private final VectorSearchService vectorSearchService;
     private final HallucinationGuardrailService guardrailService;
     private final QueryLogRepository queryLogRepository;
+    private final KnowledgeGraphService knowledgeGraphService;
 
     public RagQueryService(
             VectorSearchService vectorSearchService,
             HallucinationGuardrailService guardrailService,
-            QueryLogRepository queryLogRepository) {
+            QueryLogRepository queryLogRepository,
+            KnowledgeGraphService knowledgeGraphService) {
         this.vectorSearchService = vectorSearchService;
         this.guardrailService = guardrailService;
         this.queryLogRepository = queryLogRepository;
+        this.knowledgeGraphService = knowledgeGraphService;
     }
 
     @Transactional
@@ -71,6 +75,13 @@ public class RagQueryService {
         QueryLogEntity saved = queryLogRepository.save(logEntity);
         log.info("Query logged ID={} (Guardrail Triggered={}, Latency={}ms)",
                 saved.getId(), evaluation.guardrailTriggered(), latencyMs);
+
+        // 4. Increment topic node frequencies and edge weights in Knowledge Graph
+        try {
+            knowledgeGraphService.recordQueryTopicHits(question, saved.getCitations());
+        } catch (Exception e) {
+            log.warn("Failed to record query topic hits in Knowledge Graph: {}", e.getMessage());
+        }
 
         return new QueryResponse(
                 question,

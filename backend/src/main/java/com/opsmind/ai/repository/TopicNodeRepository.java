@@ -15,5 +15,7 @@ public interface TopicNodeRepository extends JpaRepository<TopicNodeEntity, UUID
 
     List<TopicNodeEntity> findTop15ByOrderByQueryFrequencyDesc();
 
+    List<TopicNodeEntity> findAllByOrderByQueryFrequencyDesc();
+
     List<TopicNodeEntity> findByCategory(String category);
 }
