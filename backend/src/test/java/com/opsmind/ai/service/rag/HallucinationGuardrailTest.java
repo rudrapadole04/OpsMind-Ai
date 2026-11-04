@@ -19,7 +19,7 @@ class HallucinationGuardrailTest {
     @BeforeEach
     void setUp() {
         PrecisionCitationEngine citationEngine = new PrecisionCitationEngine();
-        guardrailService = new HallucinationGuardrailService(0.60, "I don't know based on the provided corporate SOPs.", citationEngine);
+        guardrailService = new HallucinationGuardrailService(0.60, "I am not able to answer this based on the provided corporate SOPs.", citationEngine);
     }
 
     @Test
@@ -28,7 +28,7 @@ class HallucinationGuardrailTest {
         var eval = guardrailService.evaluateAndSynthesize("What is the recipe for cookies?", Collections.emptyList());
 
         assertThat(eval.guardrailTriggered()).isTrue();
-        assertThat(eval.synthesizedAnswer()).isEqualTo("I don't know based on the provided corporate SOPs.");
+        assertThat(eval.synthesizedAnswer()).isEqualTo("I am not able to answer this based on the provided corporate SOPs.");
         assertThat(eval.confidenceScore()).isEqualTo(0.0);
         assertThat(eval.citations()).isEmpty();
     }
@@ -45,7 +45,7 @@ class HallucinationGuardrailTest {
         var eval = guardrailService.evaluateAndSynthesize("How do I fix a flat tire?", List.of(sc));
 
         assertThat(eval.guardrailTriggered()).isTrue();
-        assertThat(eval.synthesizedAnswer()).isEqualTo("I don't know based on the provided corporate SOPs.");
+        assertThat(eval.synthesizedAnswer()).isEqualTo("I am not able to answer this based on the provided corporate SOPs.");
         assertThat(eval.confidenceScore()).isEqualTo(0.42);
         assertThat(eval.citations()).isEmpty();
     }

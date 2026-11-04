@@ -23,9 +23,9 @@ interface ChatMessage {
 }
 
 const PRESET_QUESTIONS = [
-  { label: '💰 Customer Refund Policy', query: 'How do I process a customer refund under $50?' },
-  { label: '🩺 Extended Sick Leave & Doctor Note', query: 'What is the policy for extended sick leave and doctor note?' },
-  { label: '🔒 IT VPN & Inactivity Limits', query: 'What are the remote access VPN session and inactivity limits?' },
+  { label: '🩺 What is sick leave ?', query: 'What is sick leave ?' },
+  { label: '💰 How can I work on customer refund ?', query: 'How can i work on customer refund ?' },
+  { label: '🔒 What are the IT VPN limits ?', query: 'What are the remote access VPN session and inactivity limits?' },
   { label: '🛡️ Test Guardrail (Out of Domain)', query: 'How do I bake chocolate chip cookies with sourdough?' },
 ];
 
@@ -34,7 +34,7 @@ export const ChatView: React.FC = () => {
     {
       id: 'welcome',
       sender: 'assistant',
-      text: 'Hello! I am **OpsMind AI**, your corporate knowledge assistant. Ask me anything about customer refunds, HR sick leave policies, or IT VPN security protocols. All answers are grounded with verified page citations and hallucination guardrails.',
+      text: 'Hello! I am **OpsMind AI**, your corporate knowledge assistant bot. You can ask me natural questions like *"What is sick leave ?"* or *"How can i work on customer refund ?"*. I will formulate an informative, structured answer based on our official corporate SOPs with exact page citations. If a question is not covered in our documentation, I will let you know: *"I am not able to answer this based on the provided corporate SOPs."*',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);

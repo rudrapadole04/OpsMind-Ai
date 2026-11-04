@@ -110,7 +110,7 @@ class HibernatePersistenceTest {
         // Out-of-domain query triggering Hallucination Guardrail
         QueryLogEntity guardrailQuery = new QueryLogEntity(
                 "What is the secret recipe for cafeteria cookies?",
-                "I don't know based on the provided corporate SOPs.",
+                "I am not able to answer this based on the provided corporate SOPs.",
                 0.12,
                 true,
                 88L
@@ -125,7 +125,7 @@ class HibernatePersistenceTest {
         List<QueryLogEntity> knowledgeGaps = queryLogRepository.findByGuardrailTriggeredTrueOrderByCreatedAtDesc();
         assertThat(knowledgeGaps).hasSize(1);
         assertThat(knowledgeGaps.get(0).getUserQuestion()).contains("cafeteria cookies");
-        assertThat(knowledgeGaps.get(0).getSynthesizedAnswer()).isEqualTo("I don't know based on the provided corporate SOPs.");
+        assertThat(knowledgeGaps.get(0).getSynthesizedAnswer()).isEqualTo("I am not able to answer this based on the provided corporate SOPs.");
 
         assertThat(queryLogRepository.countTotalQueries()).isEqualTo(2);
         assertThat(queryLogRepository.countGuardrailTriggered()).isEqualTo(1);

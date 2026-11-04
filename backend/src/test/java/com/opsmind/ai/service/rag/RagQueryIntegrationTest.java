@@ -73,6 +73,33 @@ class RagQueryIntegrationTest {
     }
 
     @Test
+    @DisplayName("Should answer conversational query 'What is sick leave ?' with informative grounded response")
+    void shouldAnswerConversationalSickLeaveQuery() {
+        QueryRequest request = new QueryRequest("What is sick leave ?");
+        QueryResponse response = ragQueryService.processQuery(request);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getGuardrailTriggered()).isFalse();
+        assertThat(response.getConfidenceScore()).isGreaterThanOrEqualTo(0.60);
+        assertThat(response.getAnswer()).contains("HR_Extended_Sick_Leave_Policy.pdf");
+        assertThat(response.getAnswer()).contains("Extended Sick Leave");
+        assertThat(response.getCitations()).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Should answer conversational query 'How can i work on customer refund ?' with procedure guidelines")
+    void shouldAnswerConversationalRefundQuery() {
+        QueryRequest request = new QueryRequest("How can i work on customer refund ?");
+        QueryResponse response = ragQueryService.processQuery(request);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getGuardrailTriggered()).isFalse();
+        assertThat(response.getConfidenceScore()).isGreaterThanOrEqualTo(0.60);
+        assertThat(response.getAnswer()).contains("Customer_Refund_and_Chargeback_SOP.pdf");
+        assertThat(response.getCitations()).isNotEmpty();
+    }
+
+    @Test
     @DisplayName("Should trigger Hallucination Guardrail and log knowledge gap for out-of-domain query")
     void shouldTriggerGuardrailForIrrelevantQueryAndLogGap() {
         QueryRequest request = new QueryRequest("How do I bake chocolate chip cookies with sourdough?");
@@ -80,7 +107,7 @@ class RagQueryIntegrationTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getGuardrailTriggered()).isTrue();
-        assertThat(response.getAnswer()).isEqualTo("I don't know based on the provided corporate SOPs.");
+        assertThat(response.getAnswer()).isEqualTo("I am not able to answer this based on the provided corporate SOPs.");
         assertThat(response.getCitations()).isEmpty();
 
         // Verify that the query was audited into database as a Knowledge Gap

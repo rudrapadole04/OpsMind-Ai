@@ -27,7 +27,8 @@ public class VectorSearchService {
             "ought", "our", "ours", "ourselves", "out", "over", "own", "same", "she", "should", "so", "some",
             "such", "than", "that", "the", "their", "theirs", "them", "themselves", "then", "there", "these",
             "they", "this", "those", "through", "to", "too", "under", "until", "up", "very", "was", "we", "were",
-            "what", "when", "where", "which", "while", "who", "whom", "why", "with", "would", "you", "your", "yours"
+            "what", "when", "where", "which", "while", "who", "whom", "why", "with", "would", "you", "your", "yours",
+            "work", "working", "tell", "help", "know", "explain", "please", "need", "want", "give", "info", "information", "detail", "details", "like"
     );
 
     private final DocumentChunkRepository chunkRepository;

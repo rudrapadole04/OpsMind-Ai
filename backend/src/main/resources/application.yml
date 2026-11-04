@@ -46,4 +46,4 @@ opsmind:
     chunk-overlap: 100
     similarity-threshold: 0.60
     max-retrieved-chunks: 5
-    fallback-message: "I don't know based on the provided corporate SOPs."
+    fallback-message: "I am not able to answer this based on the provided corporate SOPs."

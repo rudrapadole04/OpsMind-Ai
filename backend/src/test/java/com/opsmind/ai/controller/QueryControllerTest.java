@@ -90,7 +90,7 @@ class QueryControllerTest {
                         .content(objectMapper.writeValueAsString(outOfDomain)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.guardrailTriggered").value(true))
-                .andExpect(jsonPath("$.answer").value("I don't know based on the provided corporate SOPs."));
+                .andExpect(jsonPath("$.answer").value("I am not able to answer this based on the provided corporate SOPs."));
 
         mockMvc.perform(get("/api/query/knowledge-gaps"))
                 .andExpect(status().isOk())
