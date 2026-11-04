@@ -220,13 +220,13 @@ public class KnowledgeGraphService {
     /**
      * Retrieves the entire Knowledge Graph representation for visualization.
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public KnowledgeGraphDto getKnowledgeGraph() {
         List<TopicNodeEntity> nodes = topicNodeRepository.findAllByOrderByQueryFrequencyDesc();
         List<TopicEdgeEntity> edges = topicEdgeRepository.findAllByOrderByWeightDesc();
 
-        if (nodes.isEmpty()) {
-            // Self-bootstrap if not yet seeded
+        if (nodes.isEmpty() || edges.isEmpty()) {
+            // Self-bootstrap if not yet seeded or partially initialized
             return buildOrSyncGraph();
         }
 

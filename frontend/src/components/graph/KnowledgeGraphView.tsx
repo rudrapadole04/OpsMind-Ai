@@ -32,9 +32,18 @@ export const KnowledgeGraphView: React.FC = () => {
       setLoading(true);
       setError(null);
       const data = await graphApi.getGraph();
-      setGraphData(data);
-      if (data.nodes.length > 0) {
-        setSelectedNode(data.nodes[0]);
+      if (!data || !data.nodes || data.nodes.length === 0) {
+        // Automatically sync if empty
+        const synced = await graphApi.syncGraph();
+        setGraphData(synced);
+        if (synced && synced.nodes && synced.nodes.length > 0) {
+          setSelectedNode(synced.nodes[0]);
+        }
+      } else {
+        setGraphData(data);
+        if (data.nodes.length > 0) {
+          setSelectedNode(data.nodes[0]);
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load knowledge graph');
@@ -46,10 +55,14 @@ export const KnowledgeGraphView: React.FC = () => {
   const handleSync = async () => {
     try {
       setSyncing(true);
+      setError(null);
       const updated = await graphApi.syncGraph();
       setGraphData(updated);
+      if (updated && updated.nodes && updated.nodes.length > 0) {
+        setSelectedNode(updated.nodes[0]);
+      }
     } catch (err: any) {
-      alert('Sync failed: ' + err.message);
+      setError('Sync failed: ' + (err.message || 'Server error'));
     } finally {
       setSyncing(false);
     }
@@ -73,7 +86,14 @@ export const KnowledgeGraphView: React.FC = () => {
     return { ...node, x, y };
   });
 
-  const nodeMap = new Map(nodesWithCoords.map((n) => [n.name, n]));
+  const nodeMapById = new Map(nodesWithCoords.map((n) => [n.id, n]));
+  const nodeMapByName = new Map(nodesWithCoords.map((n) => [n.name.toLowerCase().trim(), n]));
+
+  const findNode = (id?: string, name?: string): GraphNode | undefined => {
+    if (id && nodeMapById.has(id)) return nodeMapById.get(id);
+    if (name && nodeMapByName.has(name.toLowerCase().trim())) return nodeMapByName.get(name.toLowerCase().trim());
+    return undefined;
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -154,8 +174,24 @@ export const KnowledgeGraphView: React.FC = () => {
               <p className="text-sm">Building Knowledge Graph from Hibernate entities...</p>
             </div>
           ) : error ? (
-            <div className="h-96 flex flex-col items-center justify-center text-rose-400 text-sm">
-              <p>Error: {error}</p>
+            <div className="h-96 flex flex-col items-center justify-center gap-3 text-slate-300 text-sm">
+              <p className="text-rose-400 font-medium">⚠️ {error}</p>
+              <button
+                onClick={handleSync}
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/30 transition"
+              >
+                Initialize & Re-sync Knowledge Graph
+              </button>
+            </div>
+          ) : nodesWithCoords.length === 0 ? (
+            <div className="h-96 flex flex-col items-center justify-center gap-3 text-slate-400 text-sm">
+              <p>No topic nodes found in database.</p>
+              <button
+                onClick={handleSync}
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/30 transition"
+              >
+                Build Knowledge Graph Topology
+              </button>
             </div>
           ) : (
             <svg
@@ -195,8 +231,8 @@ export const KnowledgeGraphView: React.FC = () => {
 
               {/* Render Connecting Edges */}
               {(graphData?.edges || []).map((edge, idx) => {
-                const s = nodeMap.get(edge.sourceName);
-                const t = nodeMap.get(edge.targetName);
+                const s = findNode(edge.sourceId, edge.sourceName);
+                const t = findNode(edge.targetId, edge.targetName);
                 if (!s || !t || s.x === undefined || s.y === undefined || t.x === undefined || t.y === undefined) {
                   return null;
                 }

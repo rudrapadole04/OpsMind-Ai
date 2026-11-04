@@ -13,9 +13,17 @@ public class PrecisionCitationEngine {
             return Collections.emptyList();
         }
 
+        double topScore = scoredChunks.get(0).getScore();
+        double relevanceCutoff = Math.max(0.60, topScore * 0.85);
+
         Map<String, CitationDto> uniqueCitations = new LinkedHashMap<>();
 
         for (ScoredChunk scored : scoredChunks) {
+            // Filter out low-scoring or tangential chunks to prevent extra topic leakage
+            if (scored.getScore() < relevanceCutoff) {
+                continue;
+            }
+
             String filename = scored.getChunk().getDocument().getFilename();
             int pageNumber = scored.getChunk().getPageNumber();
             String key = filename + "_p" + pageNumber;
@@ -41,7 +49,8 @@ public class PrecisionCitationEngine {
 
         StringBuilder sb = new StringBuilder(rawSummary.trim());
         sb.append("\n\n**Verified Sources & Citations:**\n");
-        for (int i = 0; i < citations.size(); i++) {
+        int count = Math.min(2, citations.size());
+        for (int i = 0; i < count; i++) {
             CitationDto c = citations.get(i);
             sb.append(String.format("• [%d] **%s** (Page %d) — \"%s\" [Confidence: %d%%]\n",
                     i + 1,
